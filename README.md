@@ -1,1 +1,1 @@
-# Stock-Sense
+This is currently my ongoing project.
