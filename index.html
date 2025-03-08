@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        :root {
+            --primary-color: #ff3b30;
+            --secondary-color: #007AFF;
+            --background-color: #f5f5f5;
+            --sidebar-width: 240px;
+        }
+
+        body {
+            display: flex;
+            background-color: var(--background-color);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background-color: #fff;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: #f0f0f0;
+            color: var(--primary-color);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Status Tags */
+        .status-tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-low {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+
+        .status-good {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            📦 Inventory
+        </div>
+        <div class="nav-item active">📊 Dashboard</div>
+        <div class="nav-item">📋 Inventory</div>
+        <div class="nav-item">🛍️ Sales</div>
+        <div class="nav-item">📦 Purchases</div>
+        <div class="nav-item">🔄 Transactions</div>
+        <div class="nav-item">📱 Active Channels</div>
+        <div class="nav-item">📈 Reports</div>
+        <div class="nav-item">📄 Documents</div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <input type="text" class="search-bar" placeholder="Search inventory...">
+            <div class="user-actions">
+                <button onclick="toggleNotifications()" style="padding: 8px; margin-right: 10px;">🔔</button>
+                <button onclick="toggleUserMenu()" style="padding: 8px;">👤</button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <h3>TO BE PACKED</h3>
+                <div class="value">228</div>
+            </div>
+            <div class="stat-card">
+                <h3>TO BE SHIPPED</h3>
+                <div class="value">6</div>
+            </div>
+            <div class="stat-card">
+                <h3>TO BE DELIVERED</h3>
+                <div class="value">10</div>
+            </div>
+            <div class="stat-card">
+                <h3>TOTAL INVENTORY</h3>
+                <div class="value">474</div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3>Inventory Overview</h3>
+                <canvas id="inventoryChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Top Selling Items</h3>
+                <canvas id="topSellingChart"></canvas>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3>Recent Transactions</h3>
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="transactionsList">
+                    <!-- Dynamically populated -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const inventoryData = {
+            labels: ['Active Items', 'Low Stock', 'Out of Stock'],
+            data: [171, 45, 12]
+        };
+
+        const topSellingData = {
+            labels: ['T-Shirts', 'Hoodies', 'Jeans', 'Sneakers'],
+            data: [65, 45, 32, 28]
+        };
+
+        // Initialize charts
+        const inventoryChart = new Chart(document.getElementById('inventoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: inventoryData.labels,
+                datasets: [{
+                    data: inventoryData.data,
+                    backgroundColor: ['#4CAF50', '#FFC107', '#F44336']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        const topSellingChart = new Chart(document.getElementById('topSellingChart'), {
+            type: 'bar',
+            data: {
+                labels: topSellingData.labels,
+                datasets: [{
+                    label: 'Units Sold',
+                    data: topSellingData.data,
+                    backgroundColor: '#007AFF'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Populate transactions table
+        const transactions = [
+            { product: 'Blue T-Shirt', quantity: 50, status: 'good', updated: '2024-01-03' },
+            { product: 'Red Hoodie', quantity: 5, status: 'low', updated: '2024-01-03' },
+            { product: 'Black Jeans', quantity: 25, status: 'good', updated: '2024-01-02' }
+        ];
+
+        const transactionsList = document.getElementById('transactionsList');
+        transactions.forEach(transaction => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${transaction.product}</td>
+                <td>${transaction.quantity}</td>
+                <td><span class="status-tag status-${transaction.status}">
+                    ${transaction.status.toUpperCase()}
+                </span></td>
+                <td>${transaction.updated}</td>
+            `;
+            transactionsList.appendChild(row);
+        });
+
+        // Additional features
+        function toggleNotifications() {
+            alert('Notifications panel would appear here');
+        }
+
+        function toggleUserMenu() {
+            alert('User menu would appear here');
+        }
+
+        // Search functionality
+        document.querySelector('.search-bar').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#transactionsList tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Add hover effects to nav items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelector('.nav-item.active').classList.remove('active');
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
